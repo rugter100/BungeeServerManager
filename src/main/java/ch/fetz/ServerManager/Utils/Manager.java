@@ -52,9 +52,6 @@ public class Manager {
                 plugin.getMySQL().update("INSERT INTO servermanager_servers (systemname, ip, port, displayname, motd, isactive, islobby, isrestricted, isonline) VALUES ('" + name + "', '" + ip + "', '" + port + "', '" + displayname + "', '" + motd + "', " + isActive + ", " + isLobby + ", " + isrestricted + ", " + isonline + ")");
                 if(isActive){
                     addServer(name);
-                    if(plugin.enableRedis){
-                        plugin.getRedisUtils().sendAddServer(name);
-                    }
                 }
             }
         } catch (SQLException e) {

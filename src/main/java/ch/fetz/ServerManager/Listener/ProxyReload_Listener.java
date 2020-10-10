@@ -20,9 +20,6 @@ public class ProxyReload_Listener implements Listener {
     public void onReload(ProxyReloadEvent e){
         plugin.getManager().clearAllServers();
         plugin.getManager().addAllServers();
-        if(plugin.enableRedis){
-            plugin.getRedisUtils().sendReloadAllServers();
-        }
         sendMessage(plugin.prefix + plugin.getMessages().ALL_SERVER_RELOAD_BROADCAST.replace("%PLAYER%", e.getSender().getName()));
     }
 
@@ -30,9 +27,6 @@ public class ProxyReload_Listener implements Listener {
         ProxyServer.getInstance().getConsole().sendMessage(message);
         for(ProxiedPlayer all : plugin.receiver){
             all.sendMessage(message);
-        }
-        if(plugin.enableRedis){
-            plugin.getRedisUtils().sendBroadcastMessage(message);
         }
     }
 }

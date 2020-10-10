@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.nojolp.ServerManager</groupId>
+    <groupId>ch.fetz.ServerManager</groupId>
     <artifactId>BungeeServerManager</artifactId>
     <version>1.4.3</version>
 
@@ -66,12 +66,6 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.16.3-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.imaginarycode.minecraft</groupId>
-            <artifactId>RedisBungee</artifactId>
-            <version>0.3.6-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

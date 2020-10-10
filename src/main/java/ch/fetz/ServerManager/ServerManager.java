@@ -54,8 +54,6 @@ public class ServerManager extends Plugin {
     public ArrayList<ServerInfo> lobbies = new ArrayList<>();
     public ArrayList<ServerInfo> nonlobbies = new ArrayList<>();
     public ArrayList<ProxiedPlayer> receiver = new ArrayList<>();
-    public boolean enableRedis = false;
-    public RedisUtils redisUtils;
     private PluginMessageManager pluginMessageManager;
     private final int configVersion = 3;
     private ScheduledTask serverPingTask;
@@ -77,9 +75,6 @@ public class ServerManager extends Plugin {
         createConfig();
         registerCommands();
         registerListener();
-        if(enableRedis){
-            this.redisUtils = new RedisUtils(this);
-        }
         messages.loadMessages();
         try{
             if(activateUpdater){
@@ -170,7 +165,6 @@ public class ServerManager extends Plugin {
             this.hubCommands = config.getString("General.HubCommands");
             this.activateUpdater = config.getBoolean("General.AutoUpdater");
             this.forcedServers = config.getBoolean("General.ForceServers");
-            this.enableRedis = config.getBoolean("General.EnableRedisSupport");
             this.enableOnlineCheck = config.getBoolean("General.EnableOnlineOfflineCheck");
             this.checkDelay = config.getInt("General.OnlineOfflineCheckDelay");
 
@@ -228,10 +222,6 @@ public class ServerManager extends Plugin {
 
     public Messages getMessages(){
         return this.messages;
-    }
-
-    public RedisUtils getRedisUtils(){
-        return this.redisUtils;
     }
 
     private void startServerPinging(){

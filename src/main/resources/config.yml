@@ -30,7 +30,6 @@ General:
   HubCommands: hub;lobby
   AutoUpdater: true
   ForceServers: false
-  EnableRedisSupport: false
   EnableOnlineOfflineCheck: true
   OnlineOfflineCheckDelay: 10
 

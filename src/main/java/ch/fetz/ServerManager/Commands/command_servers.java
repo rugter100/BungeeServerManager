@@ -56,9 +56,6 @@ public class command_servers extends Command implements TabExecutor {
                             p.sendMessage(plugin.prefix + "§aExecuting...");
                             plugin.getManager().clearAllServers();
                             plugin.getManager().addAllServers();
-                            if(plugin.enableRedis){
-                                plugin.getRedisUtils().sendReloadAllServers();
-                            }
                             p.sendMessage(plugin.prefix + "§aDone");
                             sendMessage(plugin.prefix + plugin.getMessages().ALL_SERVER_RELOAD_BROADCAST.replace("%PLAYER%", p.getName()));
                         }else{
@@ -81,9 +78,6 @@ public class command_servers extends Command implements TabExecutor {
                                     }
                                 }
                                 p.sendMessage(plugin.prefix + "§aExecuting...");
-                                if(plugin.enableRedis){
-                                    plugin.getRedisUtils().sendRemoveServer(name);
-                                }
                                 plugin.getManager().removeServer(name);
                                 p.sendMessage(plugin.prefix + "§aDone");
                                 sendMessage(plugin.prefix + plugin.getMessages().SERVER_DELETED_BROADCAST.replace("%SERVER%", plugin.getManager().getDisplayName(name)).replace("%PLAYER%", p.getName()));
@@ -100,9 +94,6 @@ public class command_servers extends Command implements TabExecutor {
                                 p.sendMessage(plugin.prefix + "§aExecuting...");
                                 plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
                                 plugin.getManager().addServer(name);
-                                if(plugin.enableRedis){
-                                    plugin.getRedisUtils().sendReloadServer(name);
-                                }
                                 p.sendMessage(plugin.prefix + "§aDone");
                                 sendMessage(plugin.prefix + plugin.getMessages().SERVER_RELOADED_BROADCAST.replace("%DISPLAYNAME%", plugin.getManager().getDisplayName(name)).replace("%PLAYER%", p.getName()));
                             } else {
@@ -119,9 +110,6 @@ public class command_servers extends Command implements TabExecutor {
                                     p.sendMessage(plugin.prefix + "§aExecuting...");
                                     plugin.getManager().setIsActive(name, true);
                                     plugin.getManager().addServer(name);
-                                    if(plugin.enableRedis){
-                                        plugin.getRedisUtils().sendAddServer(name);
-                                    }
                                     p.sendMessage(plugin.prefix + "§aDone");
                                     sendMessage(plugin.prefix + plugin.getMessages().SERVER_ENABLED_BROADCAST.replace("%DISPLAYNAME%", plugin.getManager().getDisplayName(name)).replace("%PLAYER%", p.getName()));
                                 }else{
@@ -145,9 +133,6 @@ public class command_servers extends Command implements TabExecutor {
                                         all.sendMessage(plugin.prefix + plugin.getMessages().PREVIOUS_SERVER_DISABLED);
                                     }
                                     plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
-                                    if(plugin.enableRedis){
-                                        plugin.getRedisUtils().sendRemoveServer(name);
-                                    }
                                     p.sendMessage(plugin.prefix + "§aDone");
                                     sendMessage(plugin.prefix + plugin.getMessages().SERVER_DISABLED_BROADCAST.replace("%DISPLAYNAME%", plugin.getManager().getDisplayName(name)).replace("%PLAYER%", p.getName()));
                                 } else {
@@ -212,9 +197,6 @@ public class command_servers extends Command implements TabExecutor {
                                             all.sendMessage(plugin.prefix + plugin.getMessages().PREVIOUS_SERVER_EMPTIED);
                                         }
                                     }
-                                    if(plugin.enableRedis){
-                                        plugin.getRedisUtils().sendEmptyServer(name);
-                                    }
                                     p.sendMessage(plugin.prefix + "§aDone");
                                     sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been emptied by §4" + p.getName());
                                 }else{
@@ -249,9 +231,6 @@ public class command_servers extends Command implements TabExecutor {
                                         plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
                                         plugin.getManager().setIsLobby(name, true);
                                         plugin.getManager().addServer(name);
-                                        if(plugin.enableRedis){
-                                            plugin.getRedisUtils().sendSetLobby(name, true);
-                                        }
                                         p.sendMessage(plugin.prefix + "§aDone");
                                         sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been flagged as a lobby by §4" + p.getName());
                                     }else{
@@ -263,9 +242,6 @@ public class command_servers extends Command implements TabExecutor {
                                         plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
                                         plugin.getManager().setIsLobby(name, false);
                                         plugin.getManager().addServer(name);
-                                        if(plugin.enableRedis){
-                                            plugin.getRedisUtils().sendSetLobby(name, false);
-                                        }
                                         p.sendMessage(plugin.prefix + "§aDone");
                                         sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been unflagged as a lobby by §4" + p.getName());
                                     }else{
@@ -393,9 +369,6 @@ public class command_servers extends Command implements TabExecutor {
                     }else if(args[0].equalsIgnoreCase("reload")){
                         plugin.getManager().clearAllServers();
                         plugin.getManager().addAllServers();
-                        if(plugin.enableRedis){
-                            plugin.getRedisUtils().sendReloadAllServers();
-                        }
                         sendMessage(plugin.prefix + plugin.getMessages().ALL_SERVER_RELOAD_BROADCAST.replace("%PLAYER%", "§4BungeeConsole"));
                     }else{
                         sendAvailableConsoleCommands(sender);
@@ -412,9 +385,6 @@ public class command_servers extends Command implements TabExecutor {
                                     all.sendMessage(plugin.prefix + "§7The server you were previously on has been deleted! You have been connected to a lobby");
                                 }
                             }
-                            if(plugin.enableRedis){
-                                plugin.getRedisUtils().sendRemoveServer(name);
-                            }
                             plugin.getManager().removeServer(name);
                             sendMessage(plugin.prefix + plugin.getMessages().SERVER_DELETED_BROADCAST.replace("%SERVER%", plugin.getManager().getDisplayName(name)).replace("%PLAYER%", "§4BungeeConsole"));
                         }else{
@@ -425,9 +395,6 @@ public class command_servers extends Command implements TabExecutor {
                         if (plugin.getManager().isInDatabase(name)) {
                             plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
                             plugin.getManager().addServer(name);
-                            if(plugin.enableRedis){
-                                plugin.getRedisUtils().sendReloadServer(name);
-                            }
                             sendMessage(plugin.prefix + plugin.getMessages().SERVER_RELOADED_BROADCAST.replace("%DISPLAYNAME%", plugin.getManager().getDisplayName(name)).replace("%PLAYER%", "§4BungeeConsole"));
                         } else {
                             sender.sendMessage(plugin.prefix + plugin.getMessages().SERVER_NOT_FOUND);
@@ -438,9 +405,6 @@ public class command_servers extends Command implements TabExecutor {
                             if(!plugin.getManager().isActive(name)) {
                                 plugin.getManager().setIsActive(name, true);
                                 plugin.getManager().addServer(name);
-                                if(plugin.enableRedis){
-                                    plugin.getRedisUtils().sendAddServer(name);
-                                }
                                 sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been enabled by §4BungeeConsole");
                             }else{
                                 sender.sendMessage(plugin.prefix + plugin.getMessages().SERVER_ALREADY_ENABLED);
@@ -458,9 +422,6 @@ public class command_servers extends Command implements TabExecutor {
                                     all.sendMessage(plugin.prefix + "§7The server you were previously on has been disabled! You have been connected to a lobby");
                                 }
                                 plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
-                                if(plugin.enableRedis){
-                                    plugin.getRedisUtils().sendRemoveServer(name);
-                                }
                                 sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been disabled by §4BungeeConsole");
                             } else {
                                 sender.sendMessage(plugin.prefix + plugin.getMessages().SERVER_ALREADY_DISABLED);
@@ -515,9 +476,6 @@ public class command_servers extends Command implements TabExecutor {
                                         all.sendMessage(plugin.prefix + "§7The server you were previously on has been emptied by a staff member");
                                     }
                                 }
-                                if(plugin.enableRedis){
-                                    plugin.getRedisUtils().sendEmptyServer(name);
-                                }
                                 sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been emptied by §4BungeeConsole");
                             }else{
                                 sender.sendMessage(plugin.prefix + plugin.getMessages().SERVER_NOT_ACTIVE);
@@ -546,9 +504,6 @@ public class command_servers extends Command implements TabExecutor {
                                     plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
                                     plugin.getManager().setIsLobby(name, true);
                                     plugin.getManager().addServer(name);
-                                    if(plugin.enableRedis){
-                                        plugin.getRedisUtils().sendSetLobby(name, true);
-                                    }
                                     sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been flagged as a lobby by §4BungeeConsole");
                                 }else{
                                     sender.sendMessage(plugin.prefix + "§7This server is already a lobby");
@@ -558,9 +513,6 @@ public class command_servers extends Command implements TabExecutor {
                                     plugin.getManager().removeServer(name, plugin.getManager().isLobby(name));
                                     plugin.getManager().setIsLobby(name, false);
                                     plugin.getManager().addServer(name);
-                                    if(plugin.enableRedis){
-                                        plugin.getRedisUtils().sendSetLobby(name, false);
-                                    }
                                     sendMessage(plugin.prefix + "§7The server " + plugin.getManager().getDisplayName(name) + " §7has been unflagged as a lobby by §4BungeeConsole");
                                 }else{
                                     sender.sendMessage(plugin.prefix + "§7This server is not a lobby");
@@ -727,9 +679,6 @@ public class command_servers extends Command implements TabExecutor {
         ProxyServer.getInstance().getConsole().sendMessage(message);
         for(ProxiedPlayer all : plugin.receiver){
             all.sendMessage(message);
-        }
-        if(plugin.enableRedis){
-            plugin.getRedisUtils().sendBroadcastMessage(message);
         }
     }
 }
