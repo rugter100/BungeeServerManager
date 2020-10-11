@@ -18,11 +18,3 @@ maven-build:
   artifacts:
     paths:
       - target/*.jar
-
-release:
-  stage: deploy
-  release:
-    name: CI Release $CI_COMMIT_SHORT_SHA
-    assets:
-    - name: BungeeServerManager.jar
-      path: target/*.jar
