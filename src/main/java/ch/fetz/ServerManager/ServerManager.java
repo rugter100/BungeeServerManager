@@ -159,9 +159,9 @@ public class ServerManager extends Plugin {
             this.headerText = config.getString("Header.HeaderText");
             this.setFooter = config.getBoolean("Footer.SetFooter");
             this.footerText = config.getString("Footer.FooterText");
-            this.motd = config.getString("Serverping.MOTDText");
-            this.enableMOTD = config.getBoolean("Serverping.SetMOTD");
-            this.onemoreplayer = config.getBoolean("Serverping.OneMorePlayer");
+            this.motd = config.getString("ServerPing.MOTDText");
+            this.enableMOTD = config.getBoolean("ServerPing.SetMOTD");
+            this.onemoreplayer = config.getBoolean("ServerPing.OneMorePlayer");
             this.hubCommands = config.getString("General.HubCommands");
             this.activateUpdater = config.getBoolean("General.AutoUpdater");
             this.forcedServers = config.getBoolean("General.ForceServers");

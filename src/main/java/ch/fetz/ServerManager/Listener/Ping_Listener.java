@@ -3,6 +3,7 @@ package ch.fetz.ServerManager.Listener;
 import ch.fetz.ServerManager.ServerManager;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -24,7 +25,7 @@ public class Ping_Listener implements Listener {
         ServerPing ping = e.getResponse();
         ServerPing.Players players = ping.getPlayers();
         if(plugin.enableMOTD){
-            ping.setDescription(ChatColor.translateAlternateColorCodes('&', plugin.motd));
+            ping.setDescriptionComponent(new TextComponent(ChatColor.translateAlternateColorCodes('&', plugin.motd)));
         }
         if(plugin.onemoreplayer){
             players.setMax(plugin.getProxy().getOnlineCount() + 1);
