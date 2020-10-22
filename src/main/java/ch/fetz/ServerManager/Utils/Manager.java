@@ -23,7 +23,7 @@ public class Manager {
 
         boolean isInDatabase = false;
 
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
 
         try {
             isInDatabase = rs.next();
@@ -46,10 +46,21 @@ public class Manager {
      * @param isrestricted
      */
     public void createServer(String name, String ip, Integer port, String motd, String displayname, Boolean isLobby, Boolean isActive, Boolean isrestricted, Boolean isonline){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT systemname FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT systemname FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             if(!rs.next()){
-                plugin.getMySQL().update("INSERT INTO servermanager_servers (systemname, ip, port, displayname, motd, isactive, islobby, isrestricted, isonline) VALUES ('" + name + "', '" + ip + "', '" + port + "', '" + displayname + "', '" + motd + "', " + isActive + ", " + isLobby + ", " + isrestricted + ", " + isonline + ")");
+                ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, ip));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.INT, 3, port));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 4, displayname));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 5, motd));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 6, isActive));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 7, isLobby));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 8, isrestricted));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 9, isonline));
+
+                plugin.getMySQL().update("INSERT INTO servermanager_servers (systemname, ip, port, displayname, motd, isactive, islobby, isrestricted, isonline) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", parameters);
                 if(isActive){
                     addServer(name);
                 }
@@ -65,10 +76,15 @@ public class Manager {
      * @param p
      */
     public void createPlayer(ProxiedPlayer p){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT uuid FROM servermanager_players WHERE uuid = '" + p.getUniqueId().toString() + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT uuid FROM servermanager_players WHERE uuid = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, p.getUniqueId().toString()));}});
         try {
             if(!rs.next()){
-                plugin.getMySQL().update("INSERT INTO servermanager_players (uuid, name, notify) VALUES ('" + p.getUniqueId().toString() + "', '" + p.getName() + "', " + false + ")");
+                ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, p.getUniqueId().toString()));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, p.getName()));
+                parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 3, false));
+
+                plugin.getMySQL().update("INSERT INTO servermanager_players (uuid, name, notify) VALUES (?, ?, ?)", parameters);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -81,11 +97,15 @@ public class Manager {
      * @param p
      */
     public void checkPlayerName(ProxiedPlayer p){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_players WHERE uuid = '" + p.getUniqueId().toString() + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_players WHERE uuid = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, p.getUniqueId().toString()));}});
         try {
             while(!rs.next()){
                 if(rs.getString("name").equals(p.getName())){
-                    plugin.getMySQL().update("UPDATE servermanager_players SET name = '" + p.getName() + "' WHERE uuid = '" + p.getUniqueId().toString() + "'");
+                    ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+                    parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, p.getName()));
+                    parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, p.getUniqueId().toString()));
+
+                    plugin.getMySQL().update("UPDATE servermanager_players SET name = ? WHERE uuid = ?", parameters);
                 }
             }
         } catch (SQLException e) {
@@ -100,7 +120,11 @@ public class Manager {
      * @param notify
      */
     public void setNotificationStatus(ProxiedPlayer p, boolean notify){
-        plugin.getMySQL().update("UPDATE servermanager_players SET notify = " + notify + " WHERE uuid = '" + p.getUniqueId().toString() + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 1, notify));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, p.getUniqueId().toString()));
+
+        plugin.getMySQL().update("UPDATE servermanager_players SET notify = ? WHERE uuid = ?", parameters);
     }
 
     /**
@@ -110,7 +134,7 @@ public class Manager {
      * @return
      */
     public Boolean getNotificationStatus(ProxiedPlayer p){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_players WHERE uuid = '" + p.getUniqueId().toString() + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_players WHERE uuid = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, p.getUniqueId().toString()));}});
         try {
             while (rs.next()){
                 return rs.getBoolean("notify");
@@ -130,7 +154,7 @@ public class Manager {
         if(isActive(name)){
             removeServer(name, isLobby(name));
         }
-        plugin.getMySQL().update("DELETE FROM servermanager_servers WHERE systemname = '" + name + "'");
+        plugin.getMySQL().update("DELETE FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
     }
 
     /**
@@ -140,7 +164,7 @@ public class Manager {
      */
     public ArrayList<String> getAllServers(){
         ArrayList<String> servers = new ArrayList<>();
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers", new ArrayList<>());
         try {
             while(rs.next()){
                 servers.add(rs.getString("systemname"));
@@ -158,7 +182,7 @@ public class Manager {
      * @return
      */
     public String getIp(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getString("ip");
@@ -176,7 +200,11 @@ public class Manager {
      * @param port
      */
     public void setPort(String name, int port){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET port = '" + port + "' WHERE systemname = '" + name + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.INT, 1, port));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET port = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -186,7 +214,7 @@ public class Manager {
      * @return
      */
     public Integer getPort(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getInt("port");
@@ -204,7 +232,11 @@ public class Manager {
      * @param ip
      */
     public void setIp(String name, String ip){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET ip = '" + ip + "' WHERE systemname = '" + name + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, ip));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET ip = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -214,7 +246,7 @@ public class Manager {
      * @return
      */
     public String getDisplayName(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getString("displayname");
@@ -232,7 +264,11 @@ public class Manager {
      * @param displayname
      */
     public void setDisplayname(String name, String displayname){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET displayname = '" + displayname + "' WHERE systemname = '" + name + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, displayname));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET displayname = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -242,7 +278,7 @@ public class Manager {
      * @return
      */
     public String getMOTD(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getString("motd");
@@ -260,7 +296,11 @@ public class Manager {
      * @param motd
      */
     public void setMOTD(String name, String motd){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET motd = '" + motd + "' WHERE systemname = '" + name + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, motd));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET motd = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -270,7 +310,7 @@ public class Manager {
      * @return
      */
     public Boolean isLobby(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getBoolean("islobby");
@@ -288,7 +328,7 @@ public class Manager {
      * @return
      */
     public Boolean isActive(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getBoolean("isactive");
@@ -306,7 +346,7 @@ public class Manager {
      * @return
      */
     public Boolean isRestricted(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getBoolean("isrestricted");
@@ -324,7 +364,7 @@ public class Manager {
      * @return
      */
     public Boolean isOnline(String name){
-        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = '" + name + "'");
+        ResultSet rs = plugin.getMySQL().getResult("SELECT * FROM servermanager_servers WHERE systemname = ?", new ArrayList<SQLStatementParameter>() {{add(new SQLStatementParameter(SQLStatementParameterType.STRING, 1, name));}});
         try {
             while(rs.next()){
                 return rs.getBoolean("isonline");
@@ -342,7 +382,11 @@ public class Manager {
      * @param isactive
      */
     public void setIsActive(String name, Boolean isactive){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET isactive = " + isactive + " WHERE systemname = '" + name + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 1, isactive));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET isactive = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -352,7 +396,11 @@ public class Manager {
      * @param lobby
      */
     public void setIsLobby(String name, Boolean lobby){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET islobby = " + lobby + " WHERE systemname = '" + name + "'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 1, lobby));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET islobby = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -362,7 +410,11 @@ public class Manager {
      * @param restricted
      */
     public void setIsRestricted(String name, Boolean restricted){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET isrestricted = " + restricted + " WHERE systemname = '" + name +"'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 1, restricted));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET isrestricted = ? WHERE systemname = ?", parameters);
     }
 
     /**
@@ -372,7 +424,11 @@ public class Manager {
      * @param isonline
      */
     public void setIsOnline(String name, Boolean isonline){
-        plugin.getMySQL().update("UPDATE servermanager_servers SET isonline = " + isonline + " WHERE systemname = '" + name +"'");
+        ArrayList<SQLStatementParameter> parameters = new ArrayList<>();
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.BOOL, 1, isonline));
+        parameters.add(new SQLStatementParameter(SQLStatementParameterType.STRING, 2, name));
+
+        plugin.getMySQL().update("UPDATE servermanager_servers SET isonline = ? WHERE systemname = ?", parameters);
     }
 
     /**

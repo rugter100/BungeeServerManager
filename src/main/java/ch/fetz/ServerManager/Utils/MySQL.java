@@ -4,6 +4,7 @@ import ch.fetz.ServerManager.ServerManager;
 import net.md_5.bungee.api.ProxyServer;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 /**
  * Created by Noah Fetz on 20.05.2016.
@@ -18,6 +19,7 @@ public class MySQL {
     public void connect(){
         try {
             Connection con = DriverManager.getConnection("jdbc:mysql://" + plugin.mysqlHost + ":" + plugin.mysqlPort + "/" + plugin.mysqlDatabase + "?autoReconnect=true" , plugin.mysqlUser, plugin.mysqlPassword);
+            con.setAutoCommit(false);
             plugin.setCon(con);
             ProxyServer.getInstance().getConsole().sendMessage(plugin.prefix + "§7MySQL §asuccessfully §7connected to the database");
         } catch (Exception ex) {
@@ -54,25 +56,70 @@ public class MySQL {
         }
     }
 
-    public void update(String qry){
+    public void update(String qry, ArrayList<SQLStatementParameter> parameters){
         try {
-            PreparedStatement ps = plugin.getCon().prepareStatement(qry);
+            PreparedStatement ps = this.plugin.getCon().prepareStatement(qry);
+
+            for(SQLStatementParameter parameter : parameters) {
+                switch (parameter.type) {
+                    case STRING:
+                        ps.setString(parameter.index, (String)parameter.value);
+                        break;
+
+                    case INT:
+                        ps.setInt(parameter.index, (int)parameter.value);
+                        break;
+
+                    case DOUBLE:
+                        ps.setDouble(parameter.index, (double)parameter.value);
+                        break;
+
+                    case BOOL:
+                        ps.setBoolean(parameter.index, (boolean)parameter.value);
+                        break;
+                }
+            }
+
             ps.executeUpdate();
+            this.plugin.getCon().commit();
         } catch (SQLException e) {
-            close();
-            connect();
-            update(qry);
+            e.printStackTrace();
+            try {
+                this.plugin.getCon().rollback();
+            }catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
 
-    public ResultSet getResult(String qry){
+    public ResultSet getResult(String qry, ArrayList<SQLStatementParameter> parameters){
         try {
-            PreparedStatement ps = plugin.getCon().prepareStatement(qry);
+            PreparedStatement ps = this.plugin.getCon().prepareStatement(qry);
+
+            for(SQLStatementParameter parameter : parameters) {
+                switch (parameter.type) {
+                    case STRING:
+                        ps.setString(parameter.index, (String)parameter.value);
+                        break;
+
+                    case INT:
+                        ps.setInt(parameter.index, (int)parameter.value);
+                        break;
+
+                    case DOUBLE:
+                        ps.setDouble(parameter.index, (double)parameter.value);
+                        break;
+
+                    case BOOL:
+                        ps.setBoolean(parameter.index, (boolean)parameter.value);
+                        break;
+                }
+            }
+
             return ps.executeQuery();
         } catch (SQLException e) {
-            close();
-            connect();
-            return getResult(qry);
+            e.printStackTrace();
+            return null;
         }
     }
 }
