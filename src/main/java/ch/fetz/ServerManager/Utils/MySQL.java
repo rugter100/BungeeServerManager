@@ -18,7 +18,13 @@ public class MySQL {
 
     public void connect(){
         try {
-            Connection con = DriverManager.getConnection("jdbc:mysql://" + plugin.mysqlHost + ":" + plugin.mysqlPort + "/" + plugin.mysqlDatabase + "?autoReconnect=true" , plugin.mysqlUser, plugin.mysqlPassword);
+            Connection con = null;
+            if(plugin.mysqlDatabase.contains("?")) {
+                con = DriverManager.getConnection("jdbc:mysql://" + plugin.mysqlHost + ":" + plugin.mysqlPort + "/" + plugin.mysqlDatabase + "&autoReconnect=true&dontTrackOpenResources=true", plugin.mysqlUser, plugin.mysqlPassword);
+            }else{
+                con = DriverManager.getConnection("jdbc:mysql://" + plugin.mysqlHost + ":" + plugin.mysqlPort + "/" + plugin.mysqlDatabase + "?autoReconnect=true&dontTrackOpenResources=true", plugin.mysqlUser, plugin.mysqlPassword);
+            }
+
             con.setAutoCommit(false);
             plugin.setCon(con);
             ProxyServer.getInstance().getConsole().sendMessage(plugin.prefix + "§7MySQL §asuccessfully §7connected to the database");
